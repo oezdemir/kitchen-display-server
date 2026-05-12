@@ -1,0 +1,22 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+.ruff_cache/
+
+# Build outputs
+dist/
+build/
+
+# Pixi
+.pixi/
+
+# Runtime state (do not commit data or secrets)
+state/*
+!state/.gitkeep
+secrets/*
+!secrets/.gitkeep
+
+# OS
+.DS_Store

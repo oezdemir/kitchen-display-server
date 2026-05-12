@@ -1,0 +1,41 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "xte-kitchen-server"
+version = "0.1.0"
+description = "Kitchen-display host service for the Xteink X4 (Hermes-driven)."
+authors = [{ name = "Ugur Oezdemir", email = "ugur@bonsairobotics.ai" }]
+readme = "README.md"
+requires-python = ">=3.12,<3.13"
+license = { text = "MIT" }
+# Note: dependencies are intentionally loose during development. The
+# `pixi run sync-deps` task rewrites this block with exact pins from
+# pixi.lock immediately before `python -m build --wheel`.
+dependencies = [
+  "fastapi>=0.115,<0.120",
+  "uvicorn[standard]>=0.32,<0.35",
+  "pillow>=10.4,<12",
+  "typer>=0.12,<0.14",
+  "httpx>=0.27,<0.29",
+  "rich>=13,<14",
+]
+
+[project.scripts]
+xte-kitchen = "xte_kitchen_server.cli:app"
+xte-kitchen-server = "xte_kitchen_server.server_entry:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-ra"
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "W", "B", "UP"]
