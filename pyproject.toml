@@ -8,7 +8,7 @@ version = "0.1.0"
 description = "Kitchen-display host service for the Xteink X4 (Hermes-driven)."
 authors = [{ name = "Ugur Oezdemir", email = "ugur@bonsairobotics.ai" }]
 readme = "README.md"
-requires-python = ">=3.12,<3.13"
+requires-python = ">=3.12,<4"
 license = { text = "MIT" }
 # Note: dependencies are intentionally loose during development. The
 # `pixi run sync-deps` task rewrites this block with exact pins from
