@@ -28,7 +28,7 @@ def test_device_200_returns_gzipped_bmp_with_etag(client, auth_headers, tmp_conf
     assert r.headers["content-type"] == "image/bmp"
     assert r.headers["content-encoding"] == "gzip"
     assert r.headers["etag"] == compute_etag(bmp)
-    assert r.content == bmp   # httpx auto-decompressed the gzipped response
+    assert r.content == bmp  # httpx auto-decompressed the gzipped response
 
 
 def test_device_304_round_trip_preserves_etag(client, auth_headers, tmp_config):

@@ -9,7 +9,8 @@ from PIL import Image
 def test_post_image_accepts_bmp_and_serves_it(client, tmp_config, auth_headers):
     bmp = make_bmp()
     r = client.post(
-        "/api/v1/image", content=bmp,
+        "/api/v1/image",
+        content=bmp,
         headers={"Content-Type": "application/octet-stream"},
     )
     assert r.status_code == 200
@@ -25,13 +26,14 @@ def test_post_image_accepts_bmp_and_serves_it(client, tmp_config, auth_headers):
 def test_post_image_accepts_png_and_converts_to_bmp(client, tmp_config, auth_headers):
     png = make_png()
     r = client.post(
-        "/api/v1/image", content=png,
+        "/api/v1/image",
+        content=png,
         headers={"Content-Type": "application/octet-stream"},
     )
     assert r.status_code == 200
     r2 = client.get("/api/v1/sleep.bmp", headers=auth_headers)
     assert r2.status_code == 200
-    served_bmp = r2.content   # auto-decompressed
+    served_bmp = r2.content  # auto-decompressed
     img = Image.open(io.BytesIO(served_bmp))
     assert img.format == "BMP"
     assert img.size == (800, 480)

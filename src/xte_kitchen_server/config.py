@@ -50,9 +50,7 @@ class Config:
             secrets_dir=_env_path("XTE_KITCHEN_SECRETS_DIR", "./secrets"),
             bind_host=os.environ.get("XTE_KITCHEN_BIND_HOST", "0.0.0.0"),
             bind_port=bind_port,
-            base_url=os.environ.get(
-                "XTE_KITCHEN_BASE_URL", f"http://127.0.0.1:{bind_port}"
-            ),
+            base_url=os.environ.get("XTE_KITCHEN_BASE_URL", f"http://127.0.0.1:{bind_port}"),
             log_level=os.environ.get("XTE_KITCHEN_LOG_LEVEL", "INFO"),
             log_file=_env_bool("XTE_KITCHEN_LOG_FILE", False),
         )

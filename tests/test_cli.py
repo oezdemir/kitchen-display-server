@@ -11,8 +11,10 @@ from xte_kitchen_server.cli import app as cli_app  # noqa: I001
 
 def _make_runner(monkeypatch, test_client):
     """Wire the CLI's httpx.Client to the FastAPI TestClient transport."""
+
     def factory(base_url: str) -> httpx.Client:
         return httpx.Client(transport=test_client._transport, base_url=base_url)
+
     monkeypatch.setattr("xte_kitchen_server.cli._make_client", factory)
     return CliRunner()
 

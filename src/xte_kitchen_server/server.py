@@ -15,9 +15,10 @@ def _bearer_dep(config: Config):
         expected = config.load_token()
         if not authorization or not authorization.startswith("Bearer "):
             raise HTTPException(status_code=401, detail="Unauthorized")
-        if authorization[len("Bearer "):] != expected:
+        if authorization[len("Bearer ") :] != expected:
             raise HTTPException(status_code=401, detail="Unauthorized")
         return expected
+
     return dep
 
 
@@ -56,10 +57,14 @@ def create_app(config: Config, *, allow_test_loopback: bool = False) -> FastAPI:
                 ua=user_agent,
                 battery_pct=x_battery_pct,
             )
-            storage.record_device_query({
-                "status": 503, "etag_in": if_none_match,
-                "ua": user_agent, "battery_pct": x_battery_pct,
-            })
+            storage.record_device_query(
+                {
+                    "status": 503,
+                    "etag_in": if_none_match,
+                    "ua": user_agent,
+                    "battery_pct": x_battery_pct,
+                }
+            )
             return Response(status_code=503, content=b"no image", media_type="text/plain")
 
         current_etag = storage.read_etag()
@@ -74,10 +79,15 @@ def create_app(config: Config, *, allow_test_loopback: bool = False) -> FastAPI:
                 ua=user_agent,
                 battery_pct=x_battery_pct,
             )
-            storage.record_device_query({
-                "status": 304, "etag_in": if_none_match, "etag_out": current_etag,
-                "ua": user_agent, "battery_pct": x_battery_pct,
-            })
+            storage.record_device_query(
+                {
+                    "status": 304,
+                    "etag_in": if_none_match,
+                    "etag_out": current_etag,
+                    "ua": user_agent,
+                    "battery_pct": x_battery_pct,
+                }
+            )
             return Response(status_code=304, headers={"ETag": current_etag})
 
         body = storage.read_image_gz()
@@ -92,10 +102,15 @@ def create_app(config: Config, *, allow_test_loopback: bool = False) -> FastAPI:
             battery_pct=x_battery_pct,
             bytes_gz=len(body),
         )
-        storage.record_device_query({
-            "status": 200, "etag_in": if_none_match, "etag_out": current_etag,
-            "ua": user_agent, "battery_pct": x_battery_pct,
-        })
+        storage.record_device_query(
+            {
+                "status": 200,
+                "etag_in": if_none_match,
+                "etag_out": current_etag,
+                "ua": user_agent,
+                "battery_pct": x_battery_pct,
+            }
+        )
         return Response(
             status_code=200,
             content=body,
@@ -130,8 +145,12 @@ def create_app(config: Config, *, allow_test_loopback: bool = False) -> FastAPI:
             raise HTTPException(status_code=422, detail=str(e)) from e
         meta = storage.write_image(bmp)
         log_event(
-            logger, "INFO", "image_post",
-            sha256=meta["sha256"], bytes_raw=meta["bytes_raw"], bytes_gz=meta["bytes_gz"],
+            logger,
+            "INFO",
+            "image_post",
+            sha256=meta["sha256"],
+            bytes_raw=meta["bytes_raw"],
+            bytes_gz=meta["bytes_gz"],
             source_ip=request.client.host if request.client else "-",
         )
         return meta
@@ -141,7 +160,9 @@ def create_app(config: Config, *, allow_test_loopback: bool = False) -> FastAPI:
         _require_loopback(request)
         storage.clear_image()
         log_event(
-            logger, "INFO", "image_delete",
+            logger,
+            "INFO",
+            "image_delete",
             source_ip=request.client.host if request.client else "-",
         )
         return {"ok": True}
@@ -150,7 +171,9 @@ def create_app(config: Config, *, allow_test_loopback: bool = False) -> FastAPI:
     def get_state(request: Request):
         _require_loopback(request)
         log_event(
-            logger, "INFO", "state_get",
+            logger,
+            "INFO",
+            "state_get",
             source_ip=request.client.host if request.client else "-",
         )
         meta = storage.read_meta()

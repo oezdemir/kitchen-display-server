@@ -6,9 +6,7 @@ from io import StringIO
 
 from xte_kitchen_server.logging_setup import KeyValueFormatter, log_event
 
-ISO_RE = re.compile(
-    r"^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}[+-]\d{2}:\d{2}  INFO  "
-)
+ISO_RE = re.compile(r"^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}[+-]\d{2}:\d{2}  INFO  ")
 
 
 def test_formatter_iso_8601_with_millis_and_offset():
