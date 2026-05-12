@@ -5,6 +5,7 @@ from __future__ import annotations
 from fastapi import Depends, FastAPI, Header, HTTPException, Request, Response
 
 from .config import Config
+from .image import ImageValidationError, convert_png_to_bmp, detect_format, validate_bmp
 from .logging_setup import log_event, setup_logging
 from .storage import Storage
 
@@ -106,5 +107,58 @@ def create_app(config: Config, *, allow_test_loopback: bool = False) -> FastAPI:
                 "Content-Length": str(len(body)),
             },
         )
+
+    def _require_loopback(request: Request) -> None:
+        host = request.client.host if request.client else ""
+        allowed = {"127.0.0.1", "::1", "localhost"}
+        if app.state.allow_test_loopback:
+            allowed.add("testclient")
+        if host not in allowed:
+            raise HTTPException(status_code=403, detail=f"loopback only (got {host!r})")
+
+    @app.post("/api/v1/image")
+    async def post_image(request: Request):
+        _require_loopback(request)
+        data = await request.body()
+        fmt = detect_format(data)
+        try:
+            if fmt == "bmp":
+                bmp = validate_bmp(data)
+            elif fmt == "png":
+                bmp = convert_png_to_bmp(data)
+            else:
+                raise HTTPException(status_code=415, detail="payload must be BMP or PNG")
+        except ImageValidationError as e:
+            raise HTTPException(status_code=422, detail=str(e)) from e
+        meta = storage.write_image(bmp)
+        log_event(
+            logger, "INFO", "image_post",
+            sha256=meta["sha256"], bytes_raw=meta["bytes_raw"], bytes_gz=meta["bytes_gz"],
+            source_ip=request.client.host if request.client else "-",
+        )
+        return meta
+
+    @app.delete("/api/v1/image")
+    def delete_image(request: Request):
+        _require_loopback(request)
+        storage.clear_image()
+        log_event(
+            logger, "INFO", "image_delete",
+            source_ip=request.client.host if request.client else "-",
+        )
+        return {"ok": True}
+
+    @app.get("/api/v1/state")
+    def get_state(request: Request):
+        _require_loopback(request)
+        log_event(
+            logger, "INFO", "state_get",
+            source_ip=request.client.host if request.client else "-",
+        )
+        meta = storage.read_meta()
+        return {
+            "current": meta,
+            "device": storage.read_device_state(),
+        }
 
     return app
