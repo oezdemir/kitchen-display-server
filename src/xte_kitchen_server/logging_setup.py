@@ -54,7 +54,7 @@ def log_event(
     rendered = _render_pairs(**fields)
     if rendered:
         msg = msg + "  " + rendered
-    logger.log(getattr(logging, level), msg)
+    logger.log(getattr(logging, level.upper(), logging.INFO), msg)
 
 
 def setup_logging(config: Config) -> logging.Logger:
