@@ -20,6 +20,10 @@ RestartSec=5
 NoNewPrivileges=true
 ProtectSystem=full
 ProtectHome=read-only
+# ProtectHome=read-only makes /home/* read-only inside the sandbox; punch a hole
+# for the service's own state dir so atomic writes (current.bmp.gz, device.json)
+# can land in /home/bot/apps/xte-kitchen-server/state.
+ReadWritePaths=/home/bot/apps/xte-kitchen-server
 PrivateTmp=true
 
 [Install]
