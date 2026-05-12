@@ -15,7 +15,7 @@ xte-kitchen-server = { path = ".", editable = true }
 fastapi = ">=0.115,<0.120"
 uvicorn = { version = ">=0.32,<0.35", extras = ["standard"] }
 pillow = ">=10.4,<12"
-typer = ">=0.12,<0.14"
+typer = ">=0.12,<0.26"
 httpx = ">=0.27,<0.29"
 rich = ">=13,<14"
 
