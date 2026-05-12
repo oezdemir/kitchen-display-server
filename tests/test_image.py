@@ -3,9 +3,9 @@ from __future__ import annotations
 import io
 
 import pytest
+from helpers import make_bmp, make_png
 from PIL import Image
 
-from tests.helpers import make_bmp, make_png
 from xte_kitchen_server.image import (
     ImageValidationError,
     convert_png_to_bmp,
