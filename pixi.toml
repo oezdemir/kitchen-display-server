@@ -11,6 +11,7 @@ python = "3.12.*"
 pip = "*"
 
 [pypi-dependencies]
+xte-kitchen-server = { path = ".", editable = true }
 fastapi = ">=0.115,<0.120"
 uvicorn = { version = ">=0.32,<0.35", extras = ["standard"] }
 pillow = ">=10.4,<12"
