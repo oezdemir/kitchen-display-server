@@ -91,8 +91,7 @@ class Storage:
 
     def clear_image(self) -> None:
         for p in (self._bmp_path(), self._etag_path(), self._meta_path()):
-            if p.exists():
-                p.unlink()
+            p.unlink(missing_ok=True)
 
     # ----- telemetry ring -----
 

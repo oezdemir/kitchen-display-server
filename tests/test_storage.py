@@ -98,7 +98,8 @@ def test_read_device_state_empty_when_no_queries(tmp_path):
 
 
 def test_atomic_write_no_tear_on_interrupted_meta(tmp_path):
-    """A reader during a write must see either the old triple or the new one, not a mix."""
+    """Stray .tmp files left by an interrupted prior write are removed on the next
+    successful write."""
     storage = Storage(state_dir=tmp_path)
     storage.write_image(make_bmp())
     first_etag = storage.read_etag()
