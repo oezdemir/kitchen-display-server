@@ -30,7 +30,7 @@ def test_detect_format_short_payload():
     assert detect_format(b"B") == "unknown"
 
 
-@pytest.mark.parametrize("mode", ["1", "L", "RGB"])
+@pytest.mark.parametrize("mode", ["1", "L", "P", "RGB", "RGBA"])
 def test_validate_bmp_accepts_supported_modes(mode):
     payload = make_bmp(mode=mode)
     assert validate_bmp(payload) == payload
