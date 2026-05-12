@@ -14,9 +14,9 @@ def _bearer_dep(config: Config):
     def dep(authorization: str | None = Header(default=None)) -> str:
         expected = config.load_token()
         if not authorization or not authorization.startswith("Bearer "):
-            raise HTTPException(status_code=401)
+            raise HTTPException(status_code=401, detail="Unauthorized")
         if authorization[len("Bearer "):] != expected:
-            raise HTTPException(status_code=401)
+            raise HTTPException(status_code=401, detail="Unauthorized")
         return expected
     return dep
 
@@ -24,7 +24,6 @@ def _bearer_dep(config: Config):
 def create_app(config: Config, *, allow_test_loopback: bool = False) -> FastAPI:
     app = FastAPI(title="xte-kitchen-server", version="0.1.0")
     app.state.config = config
-    app.state.allow_test_loopback = allow_test_loopback
     storage = Storage(config.state_dir)
     logger = setup_logging(config)
     bearer = _bearer_dep(config)
@@ -104,14 +103,13 @@ def create_app(config: Config, *, allow_test_loopback: bool = False) -> FastAPI:
                 "Content-Type": "image/bmp",
                 "Content-Encoding": "gzip",
                 "ETag": current_etag,
-                "Content-Length": str(len(body)),
             },
         )
 
     def _require_loopback(request: Request) -> None:
         host = request.client.host if request.client else ""
         allowed = {"127.0.0.1", "::1", "localhost"}
-        if app.state.allow_test_loopback:
+        if allow_test_loopback:
             allowed.add("testclient")
         if host not in allowed:
             raise HTTPException(status_code=403, detail=f"loopback only (got {host!r})")
