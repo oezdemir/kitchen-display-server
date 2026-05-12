@@ -16,7 +16,13 @@ def _env_path(key: str, default: str) -> Path:
 
 
 def _env_int(key: str, default: int) -> int:
-    return int(os.environ.get(key, str(default)))
+    raw = os.environ.get(key)
+    if raw is None:
+        return default
+    try:
+        return int(raw)
+    except ValueError:
+        raise ValueError(f"{key}={raw!r} is not a valid integer") from None
 
 
 def _env_bool(key: str, default: bool) -> bool:

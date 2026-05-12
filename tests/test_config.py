@@ -15,6 +15,7 @@ def _clear_env(monkeypatch):
 
 def test_config_defaults(monkeypatch, tmp_path):
     _clear_env(monkeypatch)
+    # cwd anchors the default ./state and ./secrets paths under tmp_path.
     monkeypatch.chdir(tmp_path)
     cfg = Config.from_env()
     assert cfg.bind_host == "0.0.0.0"
