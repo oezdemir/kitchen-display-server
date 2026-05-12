@@ -1705,14 +1705,16 @@ packages:
 - pypi: ./
   name: xte-kitchen-server
   version: 0.1.0
-  sha256: c3690996798f58bc6dc82e7c496d537388df8f289e23c36ab061fbb55cdc07e4
+  sha256: 8775a52ce7040ddbe1e5855729272dadf9aff9ff35908a010dd6aa9739376dd9
   requires_dist:
-  - fastapi>=0.115,<0.120
-  - uvicorn[standard]>=0.32,<0.35
-  - pillow>=10.4,<12
-  - typer>=0.12,<0.26
-  - httpx>=0.27,<0.29
-  - rich>=13,<14
+  - fastapi==0.119.1
+  - httpx==0.28.1
+  - pillow==11.3.0
+  - pydantic==2.13.4
+  - rich==13.9.4
+  - starlette==0.48.0
+  - typer==0.25.1
+  - uvicorn[standard]==0.34.3
   requires_python: '>=3.12,<4'
 - conda: https://conda.anaconda.org/conda-forge/linux-64/zstd-1.5.7-hb78ec9c_6.conda
   sha256: 68f0206ca6e98fea941e5717cec780ed2873ffabc0e1ed34428c061e2c6268c7
