@@ -3,16 +3,16 @@
 Kitchen-display host service for the Seeed reTerminal E1001. Serves an 800×480 BMP over a
 small HTTP wire contract (`GET /api/v1/sleep.bmp`, bearer auth, ETag-based
 conditional GET, gzip body) so the device can pull a fresh image on each
-deep-sleep wake. Designed to be driven by a future "Hermes" agent over a
-local CLI.
+deep-sleep wake. Driven by the Hermes agent through the host-skills framework
+(the `kitchen` skill — see `skill/`).
 
-**Status:** MVP complete and deployed to `bot@bot0`. 53 unit tests pass; the
-service runs under systemd as `hermes-kitchen-display-server`; the CLI is
-available as `kitchen-display`.
+**Status:** deployed and live on `bot@bot0`. 53 unit tests pass; the service runs
+under systemd as `hermes-kitchen-display-server`; the client CLI is
+`kitchen-display`; the agent drives it via the `kitchen` skill.
 
 - Wire contract: `docs/kitchen-host-api.md` (the binding wire contract).
-- Design: `docs/specs/2026-05-11-server-mvp-design.md`.
-- Build plan: `docs/plans/2026-05-11-server-mvp-plan.md`.
+- Host-skills framework + design: see the `hermes-secure-stack` repo
+  (`skills/README.md`) and `docs/superpowers/specs/2026-06-15-hermes-host-skills-design.md`.
 
 ## What's in the wheel
 
@@ -67,18 +67,26 @@ reproducible without pixi on the target.
 
 ## Deploy
 
-Recipe is in `docs/specs/2026-05-11-server-mvp-design.md` §13. Short form:
+Two pieces — the **server daemon** (always-on host service the device polls) and
+the **skill** (the `kitchen` command the agent runs).
 
-1. `pixi run build-wheel` on the Mac.
-2. `scp` the wheel, the systemd unit, and `skill/SKILL.md` to bot0.
-3. On bot0: `pipx install kitchen_display_server-*.whl`.
+**Server daemon (once):**
+1. `pixi run build-wheel` on the Mac → `dist/kitchen_display_server-*.whl`.
+2. `scp` the wheel + `systemd/hermes-kitchen-display-server.service` to bot0.
+3. `pipx install kitchen_display_server-*.whl`.
 4. `sudo cp systemd/hermes-kitchen-display-server.service /etc/systemd/system/ && sudo systemctl daemon-reload && sudo systemctl enable --now hermes-kitchen-display-server`.
-5. `openssl rand -hex 32 > /home/bot/apps/kitchen-display-server/secrets/device.token` and configure the same token on the device.
-6. `systemctl list-units 'hermes-*'` should now show the service. Smoke-test with `curl`.
+5. `openssl rand -hex 32 > /home/bot/apps/kitchen-display-server/secrets/device.token` and set the same token on the device.
 
-The `hermes-` prefix on the systemd unit is intentional — every future
-agent-driven capability on bot0 follows the same convention so
-`systemctl list-units 'hermes-*'` enumerates them all.
+**Skill (the agent's `kitchen` command):**
+```bash
+cd skill && ./build.sh                       # -> dist/kitchen-*.hskill
+scp dist/kitchen-*.hskill bot@bot0:/home/bot/
+ssh bot@bot0 'sudo hermes-skill install ~/kitchen-0.1.0-linux-x86_64.hskill'
+```
+
+The `hermes-` prefix on the systemd unit is intentional — every agent-driven
+capability on bot0 follows the same convention so `systemctl list-units 'hermes-*'`
+enumerates them all.
 
 ## Layout
 
@@ -94,9 +102,9 @@ src/kitchen_display_server/
 
 tests/                   # 53 pytest tests
 systemd/                 # hermes-kitchen-display-server.service
-skill/                   # SKILL.md for the future Hermes agent (not yet deployed)
+skill/                   # the hermes host-skill: skill.yaml + SKILL.md + build.sh/build.py
 scripts/                 # sync_deps.py + smoke_install.sh
-docs/                    # specs/ + plans/
+docs/                    # kitchen-host-api.md (binding wire contract)
 ```
 
 ## Operational notes
@@ -120,5 +128,6 @@ docs/                    # specs/ + plans/
   job; the server stores whatever it's given.
 - **Multi-device support / HTTPS / internet exposure.** Out of scope per
   contract §7 (LAN-only).
-- **Hermes integration.** Deferred until the agent exists. `skill/SKILL.md`
-  ships in the repo but is not yet copied into `~/.hermes/skills/`.
+
+Hermes integration is **live**: the `skill/` package is installed via
+`hermes-skill`, and the agent drives the display with the `kitchen` command.
