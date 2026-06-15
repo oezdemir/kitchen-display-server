@@ -1,4 +1,4 @@
-"""xte-kitchen — thin HTTP client for the local kitchen-display server."""
+"""kitchen-display — thin HTTP client for the local kitchen-display server."""
 
 from __future__ import annotations
 
@@ -9,11 +9,11 @@ from pathlib import Path
 import httpx
 import typer
 
-app = typer.Typer(add_completion=False, help="CLI for xte-kitchen-server.")
+app = typer.Typer(add_completion=False, help="CLI for kitchen-display-server.")
 
 
 def _base_url() -> str:
-    return os.environ.get("XTE_KITCHEN_BASE_URL", "http://127.0.0.1:8080")
+    return os.environ.get("KITCHEN_DISPLAY_BASE_URL", "http://127.0.0.1:8080")
 
 
 def _make_client(base_url: str) -> httpx.Client:

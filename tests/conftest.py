@@ -5,8 +5,8 @@ import os
 import pytest
 from fastapi.testclient import TestClient
 
-from xte_kitchen_server.config import Config
-from xte_kitchen_server.server import create_app
+from kitchen_display_server.config import Config
+from kitchen_display_server.server import create_app
 
 
 @pytest.fixture
@@ -16,10 +16,10 @@ def tmp_config(tmp_path, monkeypatch) -> Config:
     secrets.mkdir()
     (secrets / "device.token").write_text("test-token-abc123")
     for k in list(os.environ):
-        if k.startswith("XTE_KITCHEN_"):
+        if k.startswith("KITCHEN_DISPLAY_"):
             monkeypatch.delenv(k, raising=False)
-    monkeypatch.setenv("XTE_KITCHEN_STATE_DIR", str(state))
-    monkeypatch.setenv("XTE_KITCHEN_SECRETS_DIR", str(secrets))
+    monkeypatch.setenv("KITCHEN_DISPLAY_STATE_DIR", str(state))
+    monkeypatch.setenv("KITCHEN_DISPLAY_SECRETS_DIR", str(secrets))
     return Config.from_env()
 
 

@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from helpers import make_bmp
 
-from xte_kitchen_server.storage import Storage, compute_etag
+from kitchen_display_server.storage import Storage, compute_etag
 
 
 def test_device_401_no_auth_header(client):

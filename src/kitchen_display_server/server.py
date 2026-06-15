@@ -1,4 +1,4 @@
-"""FastAPI app factory and routes for xte-kitchen-server."""
+"""FastAPI app factory and routes for kitchen-display-server."""
 
 from __future__ import annotations
 
@@ -23,7 +23,7 @@ def _bearer_dep(config: Config):
 
 
 def create_app(config: Config, *, allow_test_loopback: bool = False) -> FastAPI:
-    app = FastAPI(title="xte-kitchen-server", version="0.1.0")
+    app = FastAPI(title="kitchen-display-server", version="0.1.0")
     app.state.config = config
     storage = Storage(config.state_dir)
     logger = setup_logging(config)

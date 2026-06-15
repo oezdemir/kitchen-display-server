@@ -1,0 +1,30 @@
+[Unit]
+Description=Hermes: kitchen-display-server (Seeed reTerminal E1001 kitchen-display host)
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=bot
+Group=bot
+WorkingDirectory=/home/bot/apps/kitchen-display-server
+Environment=KITCHEN_DISPLAY_STATE_DIR=/home/bot/apps/kitchen-display-server/state
+Environment=KITCHEN_DISPLAY_SECRETS_DIR=/home/bot/apps/kitchen-display-server/secrets
+Environment=KITCHEN_DISPLAY_BIND_HOST=0.0.0.0
+Environment=KITCHEN_DISPLAY_BIND_PORT=8080
+ExecStart=/home/bot/.local/bin/kitchen-display-server
+Restart=on-failure
+RestartSec=5
+
+# Best-effort hardening (LAN-only service; not security-critical):
+NoNewPrivileges=true
+ProtectSystem=full
+ProtectHome=read-only
+# ProtectHome=read-only makes /home/* read-only inside the sandbox; punch a hole
+# for the service's own state dir so atomic writes (current.bmp.gz, device.json)
+# can land in /home/bot/apps/kitchen-display-server/state.
+ReadWritePaths=/home/bot/apps/kitchen-display-server
+PrivateTmp=true
+
+[Install]
+WantedBy=multi-user.target

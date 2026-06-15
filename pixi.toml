@@ -1,7 +1,7 @@
 [workspace]
-name = "xte-kitchen-server"
+name = "kitchen-display-server"
 version = "0.1.0"
-description = "Kitchen-display host service for the Xteink X4 (Hermes-driven)."
+description = "Kitchen-display host service for the Seeed reTerminal E1001 (Hermes-driven)."
 authors = ["Ugur Oezdemir <ugur@bonsairobotics.ai>"]
 channels = ["conda-forge"]
 platforms = ["osx-arm64", "osx-64", "linux-64", "linux-aarch64"]
@@ -11,7 +11,7 @@ python = "3.12.*"
 pip = "*"
 
 [pypi-dependencies]
-xte-kitchen-server = { path = ".", editable = true }
+kitchen-display-server = { path = ".", editable = true }
 fastapi = ">=0.115,<0.120"
 uvicorn = { version = ">=0.32,<0.35", extras = ["standard"] }
 pillow = ">=10.4,<12"
@@ -31,8 +31,8 @@ tomli-w = ">=1.0,<2"
 default = { features = ["dev"], solve-group = "default" }
 
 [tasks]
-serve = "xte-kitchen-server"
-cli = "xte-kitchen"
+serve = "kitchen-display-server"
+cli = "kitchen-display"
 test = "pytest -q tests/"
 lint = "ruff check src/ tests/ scripts/"
 fmt = "ruff format src/ tests/ scripts/"

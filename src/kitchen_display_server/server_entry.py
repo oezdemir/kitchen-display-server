@@ -1,4 +1,4 @@
-"""Console-script entry for `xte-kitchen-server`. Boots uvicorn against create_app()."""
+"""Console-script entry for `kitchen-display-server`. Boots uvicorn against create_app()."""
 
 from __future__ import annotations
 
@@ -14,7 +14,7 @@ from .server import create_app
 def main(argv: list[str] | None = None) -> int:
     cfg = Config.from_env()
     parser = argparse.ArgumentParser(
-        prog="xte-kitchen-server",
+        prog="kitchen-display-server",
         description="Kitchen-display HTTP host service (FastAPI + uvicorn).",
     )
     parser.add_argument("--host", default=cfg.bind_host, help="bind host (default from env)")

@@ -5,7 +5,7 @@ import hashlib
 
 from helpers import make_bmp
 
-from xte_kitchen_server.storage import Storage, compute_etag
+from kitchen_display_server.storage import Storage, compute_etag
 
 
 def test_compute_etag_format_matches_contract():

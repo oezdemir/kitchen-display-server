@@ -4,12 +4,12 @@ import os
 
 import pytest
 
-from xte_kitchen_server.config import Config, TokenError
+from kitchen_display_server.config import Config, TokenError
 
 
 def _clear_env(monkeypatch):
     for key in list(os.environ):
-        if key.startswith("XTE_KITCHEN_"):
+        if key.startswith("KITCHEN_DISPLAY_"):
             monkeypatch.delenv(key, raising=False)
 
 
@@ -29,13 +29,13 @@ def test_config_defaults(monkeypatch, tmp_path):
 
 def test_config_env_overrides(monkeypatch, tmp_path):
     _clear_env(monkeypatch)
-    monkeypatch.setenv("XTE_KITCHEN_STATE_DIR", str(tmp_path / "s"))
-    monkeypatch.setenv("XTE_KITCHEN_SECRETS_DIR", str(tmp_path / "k"))
-    monkeypatch.setenv("XTE_KITCHEN_BIND_HOST", "127.0.0.1")
-    monkeypatch.setenv("XTE_KITCHEN_BIND_PORT", "9090")
-    monkeypatch.setenv("XTE_KITCHEN_BASE_URL", "http://localhost:9090")
-    monkeypatch.setenv("XTE_KITCHEN_LOG_LEVEL", "DEBUG")
-    monkeypatch.setenv("XTE_KITCHEN_LOG_FILE", "1")
+    monkeypatch.setenv("KITCHEN_DISPLAY_STATE_DIR", str(tmp_path / "s"))
+    monkeypatch.setenv("KITCHEN_DISPLAY_SECRETS_DIR", str(tmp_path / "k"))
+    monkeypatch.setenv("KITCHEN_DISPLAY_BIND_HOST", "127.0.0.1")
+    monkeypatch.setenv("KITCHEN_DISPLAY_BIND_PORT", "9090")
+    monkeypatch.setenv("KITCHEN_DISPLAY_BASE_URL", "http://localhost:9090")
+    monkeypatch.setenv("KITCHEN_DISPLAY_LOG_LEVEL", "DEBUG")
+    monkeypatch.setenv("KITCHEN_DISPLAY_LOG_FILE", "1")
     cfg = Config.from_env()
     assert cfg.state_dir == (tmp_path / "s").resolve()
     assert cfg.secrets_dir == (tmp_path / "k").resolve()
@@ -48,7 +48,7 @@ def test_config_env_overrides(monkeypatch, tmp_path):
 
 def test_config_paths_derived_from_state_dir(monkeypatch, tmp_path):
     _clear_env(monkeypatch)
-    monkeypatch.setenv("XTE_KITCHEN_STATE_DIR", str(tmp_path / "s"))
+    monkeypatch.setenv("KITCHEN_DISPLAY_STATE_DIR", str(tmp_path / "s"))
     cfg = Config.from_env()
     assert cfg.bmp_path() == (tmp_path / "s").resolve() / "current.bmp.gz"
     assert cfg.etag_path() == (tmp_path / "s").resolve() / "current.etag"
@@ -61,14 +61,14 @@ def test_load_token_strips_whitespace(monkeypatch, tmp_path):
     secrets = tmp_path / "secrets"
     secrets.mkdir()
     (secrets / "device.token").write_text("  abc123  \n")
-    monkeypatch.setenv("XTE_KITCHEN_SECRETS_DIR", str(secrets))
+    monkeypatch.setenv("KITCHEN_DISPLAY_SECRETS_DIR", str(secrets))
     cfg = Config.from_env()
     assert cfg.load_token() == "abc123"
 
 
 def test_load_token_missing_raises(monkeypatch, tmp_path):
     _clear_env(monkeypatch)
-    monkeypatch.setenv("XTE_KITCHEN_SECRETS_DIR", str(tmp_path / "secrets"))
+    monkeypatch.setenv("KITCHEN_DISPLAY_SECRETS_DIR", str(tmp_path / "secrets"))
     cfg = Config.from_env()
     with pytest.raises(TokenError, match="not found"):
         cfg.load_token()
@@ -79,7 +79,7 @@ def test_load_token_empty_raises(monkeypatch, tmp_path):
     secrets = tmp_path / "secrets"
     secrets.mkdir()
     (secrets / "device.token").write_text("   \n")
-    monkeypatch.setenv("XTE_KITCHEN_SECRETS_DIR", str(secrets))
+    monkeypatch.setenv("KITCHEN_DISPLAY_SECRETS_DIR", str(secrets))
     cfg = Config.from_env()
     with pytest.raises(TokenError, match="empty"):
         cfg.load_token()

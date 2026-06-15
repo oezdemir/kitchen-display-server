@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from fastapi.testclient import TestClient
 
-from xte_kitchen_server.server import create_app
+from kitchen_display_server.server import create_app
 
 
 def test_non_loopback_post_image_rejected(tmp_config):

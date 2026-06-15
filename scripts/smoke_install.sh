@@ -3,7 +3,7 @@
 # Catches packaging regressions before deploy.
 set -euo pipefail
 
-WHEEL="$(ls -t dist/xte_kitchen_server-*.whl 2>/dev/null | head -n1 || true)"
+WHEEL="$(ls -t dist/kitchen_display_server-*.whl 2>/dev/null | head -n1 || true)"
 if [[ -z "${WHEEL}" ]]; then
   echo "no wheel in dist/ — run \`pixi run build-wheel\` first" >&2
   exit 2
@@ -18,10 +18,10 @@ python -m venv "${TMP}/venv"
 PIPX_HOME="${TMP}/pipx-home" PIPX_BIN_DIR="${TMP}/pipx-bin" \
   "${TMP}/venv/bin/pipx" install "${WHEEL}"
 
-echo "smoke: invoking xte-kitchen-server --help"
-"${TMP}/pipx-bin/xte-kitchen-server" --help
+echo "smoke: invoking kitchen-display-server --help"
+"${TMP}/pipx-bin/kitchen-display-server" --help
 
-echo "smoke: invoking xte-kitchen --help"
-"${TMP}/pipx-bin/xte-kitchen" --help
+echo "smoke: invoking kitchen-display --help"
+"${TMP}/pipx-bin/kitchen-display" --help
 
 echo "smoke: ok"

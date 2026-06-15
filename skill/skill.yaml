@@ -2,15 +2,15 @@
 name: kitchen
 version: 0.1.0
 runtime: python
-exec: venv/bin/xte-kitchen
+exec: venv/bin/kitchen-display
 env:
-  XTE_KITCHEN_BASE_URL: http://127.0.0.1:8080   # the loopback agent endpoints on the host
+  KITCHEN_DISPLAY_BASE_URL: http://127.0.0.1:8080   # the loopback agent endpoints on the host
 commands:
   set-image:
     file_arg: 1        # `set-image <path>` — gateway materializes stdin -> host temp, substitutes here
 timeout_seconds: 30
 python:
-  package: xte-kitchen-server
-  app_wheel: ../dist/xte_kitchen_server-*.whl
+  package: kitchen-display-server
+  app_wheel: ../dist/kitchen_display_server-*.whl
   requirements: [httpx, typer]   # client-only deps (server deps live in the separate daemon)
   python_version: "312"

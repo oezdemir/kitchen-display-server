@@ -6,9 +6,9 @@ requires = [
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "xte-kitchen-server"
+name = "kitchen-display-server"
 version = "0.1.0"
-description = "Kitchen-display host service for the Xteink X4 (Hermes-driven)."
+description = "Kitchen-display host service for the Seeed reTerminal E1001 (Hermes-driven)."
 authors = [
     { name = "Ugur Oezdemir", email = "ugur@bonsairobotics.ai" },
 ]
@@ -29,8 +29,8 @@ dependencies = [
 text = "MIT"
 
 [project.scripts]
-xte-kitchen = "xte_kitchen_server.cli:app"
-xte-kitchen-server = "xte_kitchen_server.server_entry:main"
+kitchen-display = "kitchen_display_server.cli:app"
+kitchen-display-server = "kitchen_display_server.server_entry:main"
 
 [tool.setuptools.packages.find]
 where = [

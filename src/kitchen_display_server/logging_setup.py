@@ -58,7 +58,7 @@ def log_event(
 
 
 def setup_logging(config: Config) -> logging.Logger:
-    root = logging.getLogger("xte_kitchen_server")
+    root = logging.getLogger("kitchen_display_server")
     root.handlers.clear()
     root.setLevel(getattr(logging, config.log_level.upper(), logging.INFO))
 

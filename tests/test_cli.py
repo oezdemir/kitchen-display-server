@@ -6,7 +6,7 @@ import httpx
 from helpers import make_bmp
 from typer.testing import CliRunner
 
-from xte_kitchen_server.cli import app as cli_app  # noqa: I001
+from kitchen_display_server.cli import app as cli_app  # noqa: I001
 
 
 def _make_runner(monkeypatch, test_client):
@@ -15,13 +15,13 @@ def _make_runner(monkeypatch, test_client):
     def factory(base_url: str) -> httpx.Client:
         return httpx.Client(transport=test_client._transport, base_url=base_url)
 
-    monkeypatch.setattr("xte_kitchen_server.cli._make_client", factory)
+    monkeypatch.setattr("kitchen_display_server.cli._make_client", factory)
     return CliRunner()
 
 
 def test_cli_status_returns_empty_state(monkeypatch, app, client):
     runner = _make_runner(monkeypatch, client)
-    monkeypatch.setenv("XTE_KITCHEN_BASE_URL", "http://server")
+    monkeypatch.setenv("KITCHEN_DISPLAY_BASE_URL", "http://server")
     result = runner.invoke(cli_app, ["status"])
     assert result.exit_code == 0, result.output
     payload = json.loads(result.stdout)
@@ -31,7 +31,7 @@ def test_cli_status_returns_empty_state(monkeypatch, app, client):
 
 def test_cli_set_image_uploads_and_status_reflects_it(monkeypatch, tmp_path, app, client):
     runner = _make_runner(monkeypatch, client)
-    monkeypatch.setenv("XTE_KITCHEN_BASE_URL", "http://server")
+    monkeypatch.setenv("KITCHEN_DISPLAY_BASE_URL", "http://server")
     bmp = make_bmp()
     p = tmp_path / "img.bmp"
     p.write_bytes(bmp)
@@ -46,7 +46,7 @@ def test_cli_set_image_uploads_and_status_reflects_it(monkeypatch, tmp_path, app
 
 def test_cli_clear_returns_ok(monkeypatch, tmp_path, app, client):
     runner = _make_runner(monkeypatch, client)
-    monkeypatch.setenv("XTE_KITCHEN_BASE_URL", "http://server")
+    monkeypatch.setenv("KITCHEN_DISPLAY_BASE_URL", "http://server")
     p = tmp_path / "img.bmp"
     p.write_bytes(make_bmp())
     runner.invoke(cli_app, ["set-image", str(p)])
@@ -57,7 +57,7 @@ def test_cli_clear_returns_ok(monkeypatch, tmp_path, app, client):
 
 def test_cli_set_image_nonzero_on_invalid_input(monkeypatch, tmp_path, app, client):
     runner = _make_runner(monkeypatch, client)
-    monkeypatch.setenv("XTE_KITCHEN_BASE_URL", "http://server")
+    monkeypatch.setenv("KITCHEN_DISPLAY_BASE_URL", "http://server")
     p = tmp_path / "bad.bin"
     p.write_bytes(b"not an image")
     r = runner.invoke(cli_app, ["set-image", str(p)])

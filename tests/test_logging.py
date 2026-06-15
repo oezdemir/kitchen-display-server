@@ -4,7 +4,7 @@ import logging
 import re
 from io import StringIO
 
-from xte_kitchen_server.logging_setup import KeyValueFormatter, log_event
+from kitchen_display_server.logging_setup import KeyValueFormatter, log_event
 
 ISO_RE = re.compile(r"^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}[+-]\d{2}:\d{2}  INFO  ")
 
@@ -20,7 +20,7 @@ def test_log_event_emits_key_value_fields():
     buf = StringIO()
     handler = logging.StreamHandler(buf)
     handler.setFormatter(KeyValueFormatter())
-    logger = logging.getLogger("xte.test1")
+    logger = logging.getLogger("kds.test1")
     logger.handlers.clear()
     logger.addHandler(handler)
     logger.setLevel(logging.INFO)
@@ -36,7 +36,7 @@ def test_log_event_quotes_strings_with_spaces():
     buf = StringIO()
     handler = logging.StreamHandler(buf)
     handler.setFormatter(KeyValueFormatter())
-    logger = logging.getLogger("xte.test2")
+    logger = logging.getLogger("kds.test2")
     logger.handlers.clear()
     logger.addHandler(handler)
     logger.setLevel(logging.INFO)

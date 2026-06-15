@@ -1,13 +1,13 @@
 ---
 name: kitchen
-description: Update the Xteink X4 kitchen e-ink display — push an 800x480 image (PNG or BMP), clear it, or check device status/battery. Use when asked to change what the kitchen display shows.
+description: Update the Seeed reTerminal E1001 kitchen e-ink display — push an 800x480 image (PNG or BMP), clear it, or check device status/battery. Use when asked to change what the kitchen display shows.
 version: 0.1.0
 ---
 
 # kitchen — update the family kitchen display
 
 `kitchen` is a command on your PATH. It reaches a host-side service (through the
-skill-gateway) that the Xteink X4 e-ink display polls on its own schedule. You
+skill-gateway) that the Seeed reTerminal E1001 e-ink display polls on its own schedule. You
 push to the service; the device picks up the new image the next time it wakes
 (typically within ~30 min, or immediately if someone presses its refresh button).
 
