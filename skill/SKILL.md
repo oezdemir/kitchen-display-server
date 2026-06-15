@@ -1,89 +1,50 @@
 ---
-name: xte-kitchen
-description: Push a rendered kitchen-display image (BMP or PNG) to the Xteink X4 and inspect device telemetry. Use when the agent needs to update what the e-ink kitchen display shows.
+name: kitchen
+description: Update the Xteink X4 kitchen e-ink display — push an 800x480 image (PNG or BMP), clear it, or check device status/battery. Use when asked to change what the kitchen display shows.
 version: 0.1.0
 ---
 
-# xte-kitchen — push images to the Xteink X4 kitchen display
+# kitchen — update the family kitchen display
 
-This skill is a thin wrapper around the `xte-kitchen` CLI, installed
-on PATH via `pipx install xte-kitchen-server`. The CLI talks to a
-local FastAPI daemon (`hermes-xte-kitchen-server.service`, running
-on port 8080) that the Xteink X4 polls on its own schedule.
+`kitchen` is a command on your PATH. It reaches a host-side service (through the
+skill-gateway) that the Xteink X4 e-ink display polls on its own schedule. You
+push to the service; the device picks up the new image the next time it wakes
+(typically within ~30 min, or immediately if someone presses its refresh button).
 
-The display is **pull-based**: the device fetches `/api/v1/sleep.bmp`
-when it wakes (typically every 30 min or every 12 h). You do not push
-to the device; you push to the daemon, and the device picks up the
-new image the next time it wakes.
+The display is **800x480, 1-bit (black/white)**. You may push a PNG (any mode —
+the host dithers it to 1-bit) or a ready-made 1-bit BMP.
 
 ## Commands
 
-### `xte-kitchen set-image <path>`
-
-Upload an image to the daemon. Accepts:
-- 800×480 BMP (1-, 4-, 8-, 24-, or 32-bit, uncompressed)
-- 800×480 PNG (any mode) — server converts to 1-bit BMP with Floyd–Steinberg dithering
-
-**Exit codes:**
-- `0` — image accepted; prints JSON with `etag`, `sha256`, `bytes_raw`, `bytes_gz`
-- non-zero — upload failed; stderr contains the HTTP status and reason
-
-**Example:**
+### `kitchen set-image - < FILE`
+Upload an image. **The image is read from stdin**, so pipe or redirect the file:
 
 ```bash
-xte-kitchen set-image /tmp/kitchen.bmp
-# {"etag": "\"abc123def4567890\"", "sha256": "...", "bytes_raw": 48054, "bytes_gz": 3120, "updated_at": "2026-05-11T08:30:01.234-07:00"}
+kitchen set-image - < /tmp/kitchen.png
+cat /tmp/lunch.bmp | kitchen set-image -
 ```
 
-### `xte-kitchen clear`
+Prints JSON (`etag`, `sha256`, `bytes_raw`, `bytes_gz`, `updated_at`) on success.
+The image should be 800x480; PNGs are dithered to 1-bit automatically.
 
-Remove the currently-stored image. The daemon returns 503 to the
-device until the next `set-image`. After the device's stale-timeout
-elapses, it falls back to the on-SD default image.
+### `kitchen clear`
+Remove the current image. The device falls back to its on-device default after
+its stale timeout.
 
-**Example:**
+### `kitchen status`
+Show the current image's metadata and the latest device telemetry (when the
+device last polled, battery %, user agent).
 
-```bash
-xte-kitchen clear
-# {"ok": true}
-```
+### `kitchen --help`
+Show live CLI usage.
 
-### `xte-kitchen status`
+## When to use
+- The user asks to update / change the kitchen display.
+- You've rendered a new 800x480 image to show.
+- The user asks about the display device's status or battery.
 
-Show current image metadata and the latest device telemetry. Use
-this to inspect when the device last polled and what battery level
-it reported.
-
-**Output shape:**
-
-```json
-{
-  "current": {
-    "etag": "\"abc123def4567890\"",
-    "sha256": "...",
-    "bytes_raw": 48054,
-    "bytes_gz": 3120,
-    "updated_at": "2026-05-11T08:30:00.000-07:00"
-  },
-  "device": {
-    "last_seen_at": "2026-05-11T08:35:01.234-07:00",
-    "last_battery_pct": 87,
-    "last_user_agent": "CrossPoint-ESP32-1.2.3-kitchen",
-    "recent": [ /* up to 100 most-recent device queries */ ]
-  }
-}
-```
-
-Either top-level key may be `null` when no data exists yet.
-
-## When to use this skill
-
-- The user asks to update the kitchen display.
-- The agent has rendered a new BMP/PNG that represents the next display state.
-- The user asks about device status (last seen, battery level).
-- Scheduled image refresh (the agent decides timing; this skill is the action).
-
-## When **not** to use this skill
-
-- The user is asking about the device firmware itself — this skill talks to the host, not the device.
-- The user wants to remotely change the device's display schedule — that's a device-side setting (over the X4's web UI), not something this skill can do.
+## When not to use
+- Questions about the device *firmware* or its wake *schedule* — those are
+  device-side settings, not controllable here.
+- This pushes to the host service, not directly to the device; expect the
+  display to update on the device's next wake, not instantly.
