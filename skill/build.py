@@ -88,6 +88,18 @@ def main() -> int:
         for d in ("bin", "service"):
             if os.path.isdir(os.path.join(here, d)):
                 shutil.copytree(os.path.join(here, d), os.path.join(stage, d))
+        # extra externally-built artifacts, declared in skill.yaml `include:`
+        for inc in (man.get("include") or []):
+            s = os.path.join(here, inc)
+            d = os.path.join(stage, inc)
+            if os.path.isdir(s):
+                shutil.copytree(s, d, dirs_exist_ok=True)
+            elif os.path.isfile(s):
+                os.makedirs(os.path.dirname(d) or stage, exist_ok=True)
+                shutil.copy2(s, d)
+            else:
+                sys.stderr.write(f"build: include '{inc}' not found (build the artifact first)\n")
+                return 1
 
         if runtime == "python":
             py = man.get("python") or {}
