@@ -54,16 +54,32 @@ pixi run serve                     # listens on 0.0.0.0:8080
 pixi run cli -- status
 ```
 
-## Build & smoke-install
+## Build
+
+Two artifacts come out of this repo:
+
+**1. The wheel** — the daemon + client (`kitchen-display-server` + `kitchen-display`):
 
 ```bash
-pixi run build-wheel               # syncs pyproject pins from pip freeze, then python -m build
-pixi run smoke-install             # pipx-installs the wheel into a throwaway venv and runs --help
+pixi run build-wheel               # syncs pyproject pins, then python -m build
+pixi run smoke-install             # optional: pipx-install the wheel in a throwaway venv + --help
 ```
 
-Output: `dist/kitchen_display_server-0.1.0-py3-none-any.whl`. The wheel's
-`[project].dependencies` are pinned to exact versions so `pipx install` is
-reproducible without pixi on the target.
+Output: `dist/kitchen_display_server-0.1.0-py3-none-any.whl`. Deps are pinned in
+`[project.dependencies]`, so `pipx install` is reproducible without pixi on the target.
+
+**2. The skill package** (`.hskill`) — what the agent installs to get the `kitchen`
+command. It **bundles the client from the wheel above**, so build the wheel first:
+
+```bash
+pixi run build-wheel               # (if not already) -> dist/...whl that the skill bundles
+cd skill && ./build.sh             # -> skill/dist/kitchen-0.1.0-linux-x86_64.hskill
+```
+
+`skill/build.sh` is self-contained — it bundles the client wheel (via
+`app_wheel: ../dist/...` in `skill/skill.yaml`) and vendors the client's
+target-arch deps. No engine or PATH needed. Install it with `hermes-skill`
+(see Deploy).
 
 ## Deploy
 
@@ -77,12 +93,15 @@ the **skill** (the `kitchen` command the agent runs).
 4. `sudo cp systemd/hermes-kitchen-display-server.service /etc/systemd/system/ && sudo systemctl daemon-reload && sudo systemctl enable --now hermes-kitchen-display-server`.
 5. `openssl rand -hex 32 > /home/bot/apps/kitchen-display-server/secrets/device.token` and set the same token on the device.
 
-**Skill (the agent's `kitchen` command):**
+**Skill (the agent's `kitchen` command):** reuses the wheel from step 1, so build
+that first (see Build).
 ```bash
-cd skill && ./build.sh                       # -> dist/kitchen-*.hskill
+cd skill && ./build.sh                       # -> skill/dist/kitchen-*.hskill (bundles the client)
 scp dist/kitchen-*.hskill bot@bot0:/home/bot/
 ssh bot@bot0 'sudo hermes-skill install ~/kitchen-0.1.0-linux-x86_64.hskill'
 ```
+The skill is live immediately (the gateway's allowlist is the set of installed
+folders); `sudo hermes-skill remove kitchen` reverses it.
 
 The `hermes-` prefix on the systemd unit is intentional — every agent-driven
 capability on bot0 follows the same convention so `systemctl list-units 'hermes-*'`
